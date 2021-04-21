@@ -5,6 +5,20 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const config = require('./config');
+const mongoose = require('mongoose');
+
+mongoose.connect(config.db, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error: '));
+db.once('open', function() {
+  console.log('mongoose connected');
+});
 
 const indexRouter = require('./routes/index');
 const adminRouter = require('./routes/admin');
@@ -27,6 +41,7 @@ app.use(cookieSession({
   keys: config.keySession,
   maxAge: config.maxAgeSession
 }));
+
 
 app.use(function (req, res, next) {
   res.locals.path = req.path;
